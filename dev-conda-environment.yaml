@@ -1,0 +1,16 @@
+name: base
+channels:
+- conda-forge
+dependencies:
+- python =3.9
+- flake8
+- pytest
+- httpx
+- mamba
+- conda-lock
+- ipykernel
+- nbformat
+- line_profiler
+- cookiecutter
+- cruft
+- flake8-use-pathlib

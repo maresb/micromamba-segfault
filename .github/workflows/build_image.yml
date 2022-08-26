@@ -1,0 +1,34 @@
+name: Build Docker image
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}  # user/reponame
+
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    # Set permissions for GitHub token
+    # <https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions#authenticating-to-package-registries-on-github>
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b  # v3.0.2
+
+    - name: Setup Docker buildx
+      uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6  # v2.0.0
+
+    - name: Build and push Docker image
+      id: docker_build
+      uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8  # v3.0.0
+      with:
+        context: ./
+        platforms: linux/amd64
+        push: false

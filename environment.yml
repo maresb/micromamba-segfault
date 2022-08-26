@@ -1,0 +1,21 @@
+name: base
+channels:
+- conda-forge
+dependencies:
+- python =3.9
+- fastapi
+- uvicorn
+- pyyaml
+- pandas
+- pydantic
+- sqlmodel
+- alembic
+- asyncpg
+- jinja2
+- plotly
+- toml
+- psutil
+- backoff
+- python-dotenv
+platforms:
+- linux-64
