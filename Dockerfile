@@ -13,12 +13,52 @@ FROM mambaorg/micromamba:0.25.1
 COPY --chown=$MAMBA_USER:$MAMBA_USER dev-conda-lock.yml ./
 RUN micromamba install --name base --yes --file ./dev-conda-lock.yml
 
-COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml ./
+# COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml micromamba ./
 
 USER root
-RUN apt-get update && apt-get install lldb -y
+RUN apt-get update && apt-get install lldb git -y
 USER $MAMBA_USER
 
-# # The following is where the segfault occurs.
-# # I'm commenting it out in order to run lldb:
-# RUN micromamba install --name base --yes --file ./conda-lock.yml
+RUN git clone https://github.com/mamba-org/mamba.git
+WORKDIR /tmp/mamba
+RUN micromamba create --name micromamba-dev --file ./micromamba/environment-dev.yml
+RUN micromamba install --name=micromamba-dev --file ./libmamba/environment-static-dev.yml
+
+ENV ENV_NAME=micromamba-dev
+ARG MAMBA_DOCKERFILE_ACTIVATE=1 
+
+USER root
+RUN apt-get update && apt-get install build-essential -y
+USER $MAMBA_USER
+
+
+RUN : \
+&& mkdir -p build \
+&& cd build \
+&& cmake .. \
+    -DBUILD_LIBMAMBA=ON \
+    -DBUILD_STATIC_DEPS=ON \
+    -DBUILD_MICROMAMBA=ON \
+    -DMICROMAMBA_LINKAGE=FULL_STATIC \
+;
+RUN cd build && make
+
+RUN echo; echo; echo; echo; echo CHECKING OUT micromamba-0.25.1; echo; echo; echo; echo;
+# # Works:
+# RUN build/micromamba/micromamba install --name base --yes --file ./conda-lock.yml
+
+RUN git checkout micromamba-0.25.1
+RUN micromamba install --name micromamba-dev --file ./micromamba/environment-dev.yml
+RUN micromamba install --name=micromamba-dev --file ./libmamba/environment-static-dev.yml
+RUN : \
+&& mkdir -p build \
+&& cd build \
+&& cmake .. \
+    -DBUILD_LIBMAMBA=ON \
+    -DBUILD_STATIC_DEPS=ON \
+    -DBUILD_MICROMAMBA=ON \
+    -DMICROMAMBA_LINKAGE=FULL_STATIC \
+;
+RUN cd build && make
+
+RUN cd .. && micromamba install --name base --yes --file ./conda-lock.yml
