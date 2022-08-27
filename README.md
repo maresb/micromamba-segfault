@@ -5,4 +5,12 @@ conda-lock -f dev-conda-environment.yaml -p linux-64 --lockfile dev-conda-lock.y
 conda-lock
 ```
 
-Run `docker build .` to see segfault (code 139).
+Use the following commands to get the backtrace (unfortunately without debug symbols)
+
+```bash
+docker build -t micromamba-segfault .
+docker run --rm -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined micromamba-segfault bash
+lldb micromamba
+process launch -- install --name base --yes --file ./conda-lock.yml
+bt all
+```
