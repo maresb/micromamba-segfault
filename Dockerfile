@@ -30,7 +30,7 @@ ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml build-and-test.sh /tmp/
 
-RUN git checkout 7954ad1 && /tmp/build-and-test.sh
+RUN git checkout e1bf7b9 && /tmp/build-and-test.sh
 
 # RUN sed -i 's/set(CMAKE_BUILD_TYPE Release)/set(CMAKE_BUILD_TYPE Debug)/' CMakeLists.txt
 # RUN pwd && grep CMAKE_BUILD_TYPE CMakeLists.txt
