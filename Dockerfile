@@ -30,7 +30,7 @@ ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
 COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml build-and-test.sh /tmp/
 
-RUN git bisect start 5c8672e f2ac46b && git bisect run /tmp/build-and-test.sh
+RUN git bisect start 5c8672e 7954ad1 && git bisect run /tmp/build-and-test.sh
 
 RUN ../build-and-test.sh
 

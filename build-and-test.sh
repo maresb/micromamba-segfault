@@ -19,6 +19,7 @@ make
 
 set +e
 micromamba/micromamba install --name base --yes --file /tmp/conda-lock.yml
+status=$?
 if [ "$status" == 139 ]; then
     echo "Bad commit $(git rev-parse --short HEAD): SEGFAULT"
     exit 1
