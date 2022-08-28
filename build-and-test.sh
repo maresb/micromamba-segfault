@@ -16,4 +16,16 @@ cmake .. \
     -DCMAKE_C_COMPILER_LAUNCHER=sccache \
 ;
 make
+
+set +e
 micromamba/micromamba install --name base --yes --file /tmp/conda-lock.yml
+if [ "$status" == 139 ]; then
+    echo "Bad commit $(git rev-parse --short HEAD): SEGFAULT"
+    exit 1
+elif [ "$status" == 0 ]; then
+    echo "Good commit $(git rev-parse --short HEAD): NO SEGFAULT"
+    exit 0
+else
+    echo "Unknown error"
+    exit "$status"
+fi
