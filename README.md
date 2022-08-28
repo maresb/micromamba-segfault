@@ -10,7 +10,7 @@ Use the following commands to get the backtrace (unfortunately without debug sym
 ```bash
 docker build -t micromamba-segfault .
 docker run --rm -it --cap-add=SYS_PTRACE --security-opt seccomp=unconfined micromamba-segfault bash
-lldb micromamba
-process launch -- install --name base --yes --file ./conda-lock.yml
+lldb /tmp/mamba/build/micromamba/micromamba
+process launch -- install --name base --yes --file /tmp/conda-lock.yml
 bt all
 ```

@@ -16,49 +16,23 @@ RUN micromamba install --name base --yes --file ./dev-conda-lock.yml
 # COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml micromamba ./
 
 USER root
-RUN apt-get update && apt-get install lldb git -y
+RUN apt-get update && apt-get install lldb git build-essential -y
 USER $MAMBA_USER
 
 RUN git clone https://github.com/mamba-org/mamba.git
 WORKDIR /tmp/mamba
 RUN micromamba create --name micromamba-dev --file ./micromamba/environment-dev.yml
 RUN micromamba install --name=micromamba-dev --file ./libmamba/environment-static-dev.yml
+RUN micromamba install --name=micromamba-dev -c conda-forge -y sccache
 
 ENV ENV_NAME=micromamba-dev
 ARG MAMBA_DOCKERFILE_ACTIVATE=1 
 
-USER root
-RUN apt-get update && apt-get install build-essential -y
-USER $MAMBA_USER
+COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml build-and-test.sh /tmp/
 
+RUN git bisect start micromamba-0.25.0 micromamba-0.24.0 && git bisect run /tmp/build-and-test.sh
 
-RUN : \
-&& mkdir -p build \
-&& cd build \
-&& cmake .. \
-    -DBUILD_LIBMAMBA=ON \
-    -DBUILD_STATIC_DEPS=ON \
-    -DBUILD_MICROMAMBA=ON \
-    -DMICROMAMBA_LINKAGE=FULL_STATIC \
-;
-RUN cd build && make
+RUN ../build-and-test.sh
 
-RUN echo; echo; echo; echo; echo CHECKING OUT micromamba-0.25.1; echo; echo; echo; echo;
-# # Works:
-# RUN build/micromamba/micromamba install --name base --yes --file ./conda-lock.yml
-
-RUN git checkout micromamba-0.25.1
-RUN micromamba install --name micromamba-dev --file ./micromamba/environment-dev.yml
-RUN micromamba install --name=micromamba-dev --file ./libmamba/environment-static-dev.yml
-RUN : \
-&& mkdir -p build \
-&& cd build \
-&& cmake .. \
-    -DBUILD_LIBMAMBA=ON \
-    -DBUILD_STATIC_DEPS=ON \
-    -DBUILD_MICROMAMBA=ON \
-    -DMICROMAMBA_LINKAGE=FULL_STATIC \
-;
-RUN cd build && make
-
-RUN cd .. && micromamba install --name base --yes --file ./conda-lock.yml
+# RUN sed -i 's/set(CMAKE_BUILD_TYPE Release)/set(CMAKE_BUILD_TYPE Debug)/' CMakeLists.txt
+# RUN pwd && grep CMAKE_BUILD_TYPE CMakeLists.txt
