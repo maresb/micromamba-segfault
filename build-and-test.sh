@@ -18,7 +18,7 @@ cmake .. \
 make
 
 set +e
-micromamba/micromamba install --name base --yes --file /tmp/conda-lock.yml
+micromamba/micromamba install --name tmp4 --yes --file /tmp/conda-lock.yml
 status=$?
 if [ "$status" == 139 ]; then
     echo "Bad commit $(git rev-parse --short HEAD): SEGFAULT"
