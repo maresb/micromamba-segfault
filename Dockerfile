@@ -10,8 +10,8 @@ FROM mambaorg/micromamba:0.25.1
 # COPY --chown=$MAMBA_USER:$MAMBA_USER dev-conda-environment.yaml ./
 # RUN micromamba install --name base --yes --file ./dev-conda-environment.yaml
 
-COPY --chown=$MAMBA_USER:$MAMBA_USER dev-conda-lock.yml ./
-RUN micromamba install --name base --yes --file ./dev-conda-lock.yml
+COPY --chown=$MAMBA_USER:$MAMBA_USER dev-conda-environment.yaml ./
+RUN micromamba create --name tmp4 --yes --file ./dev-conda-environment.yaml
 
 # COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml micromamba ./
 
@@ -28,9 +28,9 @@ RUN micromamba install --name=micromamba-dev -c conda-forge -y sccache
 ENV ENV_NAME=micromamba-dev
 ARG MAMBA_DOCKERFILE_ACTIVATE=1 
 
-COPY --chown=$MAMBA_USER:$MAMBA_USER conda-lock.yml build-and-test.sh /tmp/
+ADD https://gist.githubusercontent.com/jonashaag/9bedb594f977a4122841c1e8ad525be3/raw/9dff2df11c557d572965f92277b8c748fc060b1d/dev-conda-lock.yml /tmp/
 
-RUN git checkout 7954ad1 && /tmp/build-and-test.sh
+RUN git checkout 5c41be2 && /tmp/build-and-test.sh
 
 # RUN sed -i 's/set(CMAKE_BUILD_TYPE Release)/set(CMAKE_BUILD_TYPE Debug)/' CMakeLists.txt
 # RUN pwd && grep CMAKE_BUILD_TYPE CMakeLists.txt
