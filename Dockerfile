@@ -30,6 +30,7 @@ ARG MAMBA_DOCKERFILE_ACTIVATE=1
 
 ADD https://gist.githubusercontent.com/jonashaag/9bedb594f977a4122841c1e8ad525be3/raw/9dff2df11c557d572965f92277b8c748fc060b1d/dev-conda-lock.yml /tmp/
 
+COPY --chown=$MAMBA_USER:$MAMBA_USER build-and-test.sh /tmp/
 RUN git checkout 5c41be2 && /tmp/build-and-test.sh
 
 # RUN sed -i 's/set(CMAKE_BUILD_TYPE Release)/set(CMAKE_BUILD_TYPE Debug)/' CMakeLists.txt
